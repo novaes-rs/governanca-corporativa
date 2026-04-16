@@ -719,6 +719,46 @@ function renderProjector() {
     return;
   }
 
+  // Bloco de síntese — aparece quando todas as 5 equipes entregaram
+  const allDone = count === 5;
+  const synthesisBlock = allDone ? `
+  <div style="margin-top:1.5rem;border:2.5px solid #001F3F;border-radius:18px;overflow:hidden">
+    <div style="background:#001F3F;padding:.9rem 1.5rem;display:flex;align-items:center;gap:.75rem">
+      <span style="font-size:1.4rem">🎓</span>
+      <div>
+        <div style="color:#fff;font-weight:900;font-size:1.05rem">Síntese Comparativa — Compliance Público vs. Privado</div>
+        <div style="color:#93c5fd;font-size:.8rem">Gerada a partir das investigações das 5 equipes</div>
+      </div>
+    </div>
+    <div style="background:#f8faff;padding:1.25rem 1.5rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+      <div style="background:#fff;border:2px solid #E8F0FE;border-radius:12px;padding:1rem">
+        <div style="font-size:.7rem;font-weight:800;color:#001F3F;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">🏛️ Setor Público (Equipes 1, 2 e 4)</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:.4rem">
+          <li style="font-size:.82rem;color:#001F3F;display:flex;gap:.5rem"><span>▸</span>Obrigação legal de transparência — Lei 14.133/2021 e LAI regulam cada etapa</li>
+          <li style="font-size:.82rem;color:#001F3F;display:flex;gap:.5rem"><span>▸</span>Editais e contratos são públicos e auditáveis por qualquer cidadão</li>
+          <li style="font-size:.82rem;color:#001F3F;display:flex;gap:.5rem"><span>▸</span>Compliance é imposto de fora para dentro — sanção, CEIS e controle externo</li>
+          <li style="font-size:.82rem;color:#001F3F;display:flex;gap:.5rem"><span>▸</span>Falhas geram responsabilização administrativa, civil e penal do agente público</li>
+        </ul>
+      </div>
+      <div style="background:#fff;border:2px solid #E8F0FE;border-radius:12px;padding:1rem">
+        <div style="font-size:.7rem;font-weight:800;color:#001F3F;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.6rem">🏢 Setor Privado (Equipes 3 e 5)</div>
+        <ul style="list-style:none;display:flex;flex-direction:column;gap:.4rem">
+          <li style="font-size:.82rem;color:#001F3F;display:flex;gap:.5rem"><span>▸</span>Programa de integridade é voluntário, mas exigido para contratar com o governo</li>
+          <li style="font-size:.82rem;color:#001F3F;display:flex;gap:.5rem"><span>▸</span>Novo Mercado e ESG criam pressão de mercado por governança robusta</li>
+          <li style="font-size:.82rem;color:#001F3F;display:flex;gap:.5rem"><span>▸</span>Compliance é construído de dentro para fora — cultura, liderança e riscos</li>
+          <li style="font-size:.82rem;color:#001F3F;display:flex;gap:.5rem"><span>▸</span>Falhas geram multas da CVM, perda de contratos públicos e dano reputacional</li>
+        </ul>
+      </div>
+      <div style="grid-column:1/-1;background:#001F3F;border-radius:12px;padding:1rem;display:flex;gap:1rem;align-items:flex-start">
+        <span style="font-size:1.5rem;flex-shrink:0">💡</span>
+        <div>
+          <div style="color:#93c5fd;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.35rem">Ponto de Convergência</div>
+          <p style="color:#fff;font-size:.85rem;line-height:1.6">Tanto no setor público quanto no privado, compliance efetivo depende de <strong style="color:#bfdbfe">cultura organizacional</strong>, não apenas de documentos. A diferença está no <strong style="color:#bfdbfe">motor</strong>: no público, é a lei e o controle externo; no privado, é o mercado e a reputação. Nos dois casos, a ausência de compliance gera custos muito maiores do que sua implementação.</p>
+        </div>
+      </div>
+    </div>
+  </div>` : '';
+
   // Released — show results grid
   body.innerHTML = `<div class="proj-results">
     <div class="results-header">
@@ -730,10 +770,8 @@ function renderProjector() {
         const r = responses[m.team];
         const done = r && r._submitted;
         const color = m.color;
-        const lightBg = '#f0f4ff';
         let fieldsHtml = '';
         if (done) {
-          // show first 3 fields
           fieldsHtml = m.fields.slice(0,3).map(f=>`
             <div class="rc-field">
               <div class="rcf-label">${f.label.substring(0,40)}</div>
@@ -751,6 +789,7 @@ function renderProjector() {
         </div>`;
       }).join('')}
     </div>
+    ${synthesisBlock}
   </div>`;
 }
 
