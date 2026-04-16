@@ -263,6 +263,7 @@ body{font-family:'Inter',sans-serif;background:var(--white);color:var(--navy);mi
       <div class="card">
         <div class="card-title">Controles da Aula</div>
         <div class="ctrl-grid">
+          <button class="ctrl-btn" id="btn-missions" onclick="toggleMissions()" style="background:#16a34a;color:#fff;border-color:#16a34a">🔓 Liberar Missões</button>
           <button class="ctrl-btn navy" id="btn-release" onclick="toggleRelease()">👁 Liberar no Projetor</button>
           <button class="ctrl-btn outline" onclick="clearAll()">🗑 Limpar Respostas</button>
           <button class="ctrl-btn outline full" onclick="openProj()">📺 Abrir Projetor (nova aba)</button>
@@ -282,6 +283,7 @@ body{font-family:'Inter',sans-serif;background:var(--white);color:var(--navy);mi
       <div class="card">
         <div class="card-title">Status</div>
         <div class="status-rows">
+          <div class="status-row"><span>Missões</span><span class="pill" id="st-missions">BLOQUEADAS</span></div>
           <div class="status-row"><span>Projetor</span><span class="pill" id="st-proj">OCULTO</span></div>
           <div class="status-row"><span>Equipes entregaram</span><span class="pill pill-yellow" id="st-teams">0/5</span></div>
         </div>
@@ -474,12 +476,44 @@ window.addEventListener('hashchange', route);
 let currentTeamIdx = 0;
 
 function enterMission(idx) {
+  const st = loadState();
+  if (!st.missionsOpen) {
+    // Mostra tela de espera e fica verificando a cada 3s
+    currentTeamIdx = idx;
+    const m = MISSIONS[idx];
+    document.getElementById('m-team-name').textContent = m.team;
+    showScreen('s-mission');
+    renderWaiting(idx);
+    if (window._waitLoop) clearInterval(window._waitLoop);
+    window._waitLoop = setInterval(() => {
+      const s = loadState();
+      if (s.missionsOpen) {
+        clearInterval(window._waitLoop);
+        renderMission(idx);
+      }
+    }, 2000);
+    return;
+  }
   currentTeamIdx = idx;
   const m = MISSIONS[idx];
   document.getElementById('m-team-name').textContent = m.team;
   renderMission(idx);
   showScreen('s-mission');
-  startMissionLoop(idx);
+}
+
+function renderWaiting(idx) {
+  const m = MISSIONS[idx];
+  const body = document.getElementById('m-body');
+  body.innerHTML = `
+    <div style="text-align:center;padding:3rem 1rem;display:flex;flex-direction:column;align-items:center;gap:1.25rem">
+      <div style="width:80px;height:80px;border-radius:50%;background:#E8F0FE;display:flex;align-items:center;justify-content:center;font-size:2.2rem">🔒</div>
+      <h2 style="font-size:1.4rem;font-weight:900;color:#001F3F">${m.team} — Aguardando</h2>
+      <p style="color:#4b5563;font-size:.95rem;line-height:1.6;max-width:320px">O professor ainda não liberou as missões.<br>Fique nessa tela. A missão aparecerá automaticamente quando liberada.</p>
+      <div style="display:flex;align-items:center;gap:.5rem;color:#6b7280;font-size:.8rem">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10"/></svg>
+        Verificando a cada 2 segundos...
+      </div>
+    </div>`;
 }
 
 // Armazena rascunho em memória para não perder o que o aluno está digitando
@@ -606,6 +640,12 @@ function renderDash() {
   const responses = st.responses || {};
   const count = Object.values(responses).filter(r=>r&&r._submitted).length;
 
+  // btn missions
+  const btnM = document.getElementById('btn-missions');
+  btnM.textContent = st.missionsOpen ? '🔒 Bloquear Missões' : '🔓 Liberar Missões';
+  btnM.style.background = st.missionsOpen ? '#dc2626' : '#16a34a';
+  btnM.style.borderColor = st.missionsOpen ? '#dc2626' : '#16a34a';
+
   // btn release
   const btn = document.getElementById('btn-release');
   btn.textContent = st.released ? '🙈 Ocultar do Projetor' : '👁 Liberar no Projetor';
@@ -614,6 +654,9 @@ function renderDash() {
   // status
   document.getElementById('d-count').textContent = `${count}/5`;
   document.getElementById('st-teams').textContent = `${count}/5`;
+  const stMissions = document.getElementById('st-missions');
+  stMissions.textContent = st.missionsOpen ? 'LIBERADAS' : 'BLOQUEADAS';
+  stMissions.className = `pill ${st.missionsOpen?'pill-on':'pill-off'}`;
   const stProj = document.getElementById('st-proj');
   stProj.textContent = st.released ? 'VISÍVEL' : 'OCULTO';
   stProj.className = `pill ${st.released?'pill-on':'pill-off'}`;
@@ -640,6 +683,13 @@ function renderDash() {
       <span style="font-weight:800;width:70px">${m.team}</span>
       <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m.title}</span>
     </div>`).join('');
+}
+
+function toggleMissions() {
+  const st = loadState();
+  st.missionsOpen = !st.missionsOpen;
+  saveState(st);
+  renderDash();
 }
 
 function toggleRelease() {
