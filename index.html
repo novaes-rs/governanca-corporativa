@@ -482,9 +482,21 @@ function enterMission(idx) {
   startMissionLoop(idx);
 }
 
+// Armazena rascunho em memória para não perder o que o aluno está digitando
+const draft = {};
+
+function saveDraft(idx) {
+  const m = MISSIONS[idx];
+  draft[m.team] = {};
+  m.fields.forEach(f => {
+    const el = document.getElementById('f_'+f.id);
+    if (el) draft[m.team][f.id] = el.value;
+  });
+}
+
 function startMissionLoop(idx) {
-  if (window._missionLoop) clearInterval(window._missionLoop);
-  window._missionLoop = setInterval(() => renderMission(idx), 3000);
+  // Não faz polling na tela do aluno para evitar apagar o que está digitando.
+  // A tela só re-renderiza quando o aluno entrega ou edita manualmente.
 }
 
 function renderMission(idx) {
@@ -492,6 +504,8 @@ function renderMission(idx) {
   const st = loadState();
   const resp = st.responses[m.team];
   const body = document.getElementById('m-body');
+  // Salva rascunho antes de re-renderizar (caso seja chamado após submit/edit)
+  if (draft[m.team] === undefined) draft[m.team] = {};
 
   if (resp && resp._submitted) {
     body.innerHTML = `
@@ -524,7 +538,7 @@ function renderMission(idx) {
       ${m.fields.map(f=>`
         <div class="field-group">
           <label>${f.label}</label>
-          <textarea rows="${f.rows}" id="f_${f.id}" placeholder="Escreva aqui...">${resp?resp[f.id]||'':''}</textarea>
+          <textarea rows="${f.rows}" id="f_${f.id}" placeholder="Escreva aqui..." oninput="saveDraft(${idx})">${(draft[m.team]&&draft[m.team][f.id]!==undefined)?draft[m.team][f.id]:(resp?resp[f.id]||'':'')}</textarea>
         </div>`).join('')}
       <button class="submit-btn" onclick="submitMission(${idx})">📤 Entregar Investigação da ${m.team}</button>
     </div>`;
@@ -534,7 +548,11 @@ function renderMission(idx) {
 function editSubmission(idx) {
   const st = loadState();
   const m = MISSIONS[idx];
-  if (st.responses[m.team]) st.responses[m.team]._submitted = false;
+  // Restaura os valores salvos para o rascunho ao editar
+  if (st.responses[m.team]) {
+    draft[m.team] = Object.assign({}, st.responses[m.team]);
+    st.responses[m.team]._submitted = false;
+  }
   saveState(st);
   renderMission(idx);
 }
@@ -550,6 +568,8 @@ function submitMission(idx) {
     data[f.id] = val;
   });
   if (empty) { alert('Preencha todos os campos antes de entregar.'); return; }
+  // Limpa rascunho após entrega
+  if (draft[m.team]) draft[m.team] = {};
   const st = loadState();
   if (!st.responses) st.responses = {};
   st.responses[m.team] = data;
