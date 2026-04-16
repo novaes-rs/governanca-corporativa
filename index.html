@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Compliance — Governança Corporativa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #001F3F;
+      --navy2: #003D7A;
+      --navy3: #0055A5;
+      --navy4: #0066CC;
+      --pale: #E8F0FE;
+      --pale2: #dce8f8;
+      --white: #ffffff;
+      --gray: #6b7280;
+      --green: #16a34a;
+      --red: #dc2626;
+      --yellow: #ca8a04;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--white); color: var(--navy); min-height: 100vh; }
+
+    /* ===== SCREENS ===== */
+    .screen { display: none; min-height: 100vh; flex-direction: column; }
+    .screen.active { display: flex; }
+
+    /* ===== TEAM SELECT ===== */
+    #screen-team { align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .team-header { text-align: center; margin-bottom: 2.5rem; }
+    .team-logo { width: 72px; height: 72px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .team-logo svg { width: 36px; height: 36px; fill: none; stroke: white; stroke-width: 2; }
+    .team-header h1 { font-size: 1.5rem; font-weight: 800; color: var(--navy); }
+    .team-header p { color: var(--navy2); font-weight: 600; font-size: 1rem; margin-top: 0.25rem; }
+    .team-header small { color: var(--gray); font-size: 0.8rem; margin-top: 0.5rem; display: block; }
+    .team-list { width: 100%; max-width: 360px; display: flex; flex-direction: column; gap: 0.75rem; }
+    .team-btn { width: 100%; padding: 1.25rem 1.5rem; border-radius: 14px; border: none; color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; gap: 1rem; transition: opacity 0.15s, transform 0.1s; }
+    .team-btn:hover { opacity: 0.9; } .team-btn:active { transform: scale(0.97); }
+    .team-btn:nth-child(1) { background: #001F3F; }
+    .team-btn:nth-child(2) { background: #003D7A; }
+    .team-btn:nth-child(3) { background: #0055A5; }
+    .team-btn:nth-child(4) { background: #0066CC; }
+    .team-btn:nth-child(5) { background: #1a3a6b; }
+    .team-btn .team-icon { font-size: 1.5rem; }
+    .team-footer { margin-top: 2rem; font-size: 0.75rem; color: var(--gray); text-align: center; }
+
+    /* ===== CONFIRM ===== */
+    #screen-confirm { align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .confirm-box { width: 100%; max-width: 360px; text-align: center; }
+    .confirm-card { border: 2px solid var(--navy); border-radius: 18px; padding: 2.5rem 2rem; background: var(--pale); margin-bottom: 1.5rem; }
+    .confirm-card .big-icon { font-size: 3.5rem; margin-bottom: 1rem; }
+    .confirm-card h2 { font-size: 1.6rem; font-weight: 800; color: var(--navy); }
+    .confirm-card p { color: var(--navy2); font-size: 0.9rem; margin-top: 0.5rem; }
+    .confirm-btns { display: flex; gap: 0.75rem; }
+    .btn-back { flex: 1; padding: 1rem; border: 2px solid var(--navy); background: white; color: var(--navy); font-weight: 600; border-radius: 12px; cursor: pointer; font-size: 1rem; }
+    .btn-enter { flex: 1; padding: 1rem; background: var(--navy); color: white; font-weight: 700; border-radius: 12px; border: none; cursor: pointer; font-size: 1rem; }
+    .btn-enter:active { transform: scale(0.97); }
+
+    /* ===== ACTIVITY SCREEN ===== */
+    #screen-activity { flex-direction: column; }
+    .act-topbar { background: var(--navy); color: white; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+    .act-topbar .team-name { font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; }
+    .act-topbar .slide-info { font-size: 0.75rem; color: #93c5fd; }
+    .act-topbar .leave-btn { font-size: 0.75rem; color: #93c5fd; background: none; border: none; cursor: pointer; text-decoration: underline; }
+    .act-body { flex: 1; padding: 1.25rem 1rem; max-width: 480px; margin: 0 auto; width: 100%; }
+    .slide-badge { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; margin-bottom: 1rem; }
+    .badge-activity { background: var(--navy); color: white; }
+    .badge-content { background: var(--pale); color: var(--navy); }
+    .slide-title { font-size: 1.2rem; font-weight: 800; color: var(--navy); margin-bottom: 1rem; line-height: 1.3; }
+    .highlight-box { background: var(--navy); color: white; border-radius: 14px; padding: 1rem; margin-bottom: 1rem; font-size: 0.9rem; font-weight: 500; line-height: 1.5; }
+    .content-list { list-style: none; }
+    .content-list li { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.6rem 0; border-bottom: 1px solid var(--pale); font-size: 0.9rem; line-height: 1.5; color: var(--navy); }
+    .content-list li:last-child { border-bottom: none; }
+    .content-list li::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--navy); flex-shrink: 0; margin-top: 0.4rem; }
+    .waiting-box { margin-top: 1.5rem; background: var(--pale); border-radius: 14px; padding: 1.25rem; text-align: center; }
+    .waiting-box p { color: var(--navy); font-weight: 600; font-size: 0.9rem; }
+    .waiting-box small { color: var(--navy2); font-size: 0.8rem; margin-top: 0.25rem; display: block; }
+    /* Activity */
+    .question-box { background: var(--pale); border-radius: 14px; padding: 1rem; margin-bottom: 1rem; font-weight: 600; font-size: 0.9rem; color: var(--navy); line-height: 1.6; white-space: pre-line; }
+    .hint-box { border: 1px solid var(--navy2); border-radius: 12px; padding: 0.75rem; margin-bottom: 1rem; font-size: 0.8rem; color: var(--navy2); }
+    .hint-box strong { color: var(--navy); }
+    .options-list { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1rem; }
+    .option-btn { width: 100%; text-align: left; padding: 1rem; border-radius: 12px; border: 2px solid var(--pale); background: white; color: var(--navy); font-size: 0.9rem; font-weight: 500; cursor: pointer; line-height: 1.4; transition: all 0.15s; }
+    .option-btn:hover { border-color: var(--navy2); }
+    .option-btn.selected { border-color: var(--navy); background: var(--navy); color: white; }
+    .option-btn .opt-id { font-weight: 800; margin-right: 0.4rem; }
+    textarea.open-answer { width: 100%; border: 2px solid var(--pale); border-radius: 12px; padding: 1rem; font-size: 0.9rem; color: var(--navy); font-family: 'Inter', sans-serif; resize: none; outline: none; margin-bottom: 1rem; }
+    textarea.open-answer:focus { border-color: var(--navy); }
+    .submit-btn { width: 100%; padding: 1rem; background: var(--navy); color: white; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .points-note { text-align: center; font-size: 0.75rem; color: var(--gray); margin-top: 0.5rem; }
+    /* Submitted */
+    .submitted-box { text-align: center; padding: 3rem 1rem; }
+    .submitted-box .check-icon { font-size: 4rem; margin-bottom: 1rem; }
+    .submitted-box h3 { font-size: 1.4rem; font-weight: 800; color: var(--navy); margin-bottom: 0.5rem; }
+    .submitted-box p { color: var(--gray); font-size: 0.9rem; }
+    .points-badge { display: inline-block; background: var(--pale); border-radius: 12px; padding: 0.75rem 1.5rem; margin-top: 1rem; font-weight: 700; color: var(--navy); }
+    /* Nav buttons */
+    .nav-btns { display: flex; gap: 0.75rem; margin-top: 1.5rem; }
+    .nav-btn { flex: 1; padding: 0.85rem; border-radius: 12px; font-weight: 600; font-size: 0.9rem; cursor: pointer; border: 2px solid var(--navy); }
+    .nav-btn.primary { background: var(--navy); color: white; }
+    .nav-btn.secondary { background: white; color: var(--navy); }
+
+    /* ===== PROFESSOR LOGIN ===== */
+    #screen-prof-login { align-items: center; justify-content: center; padding: 2rem 1rem; }
+    .login-box { width: 100%; max-width: 360px; }
+    .login-box .logo { text-align: center; margin-bottom: 2rem; }
+    .login-box .logo .icon-wrap { width: 80px; height: 80px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .login-box .logo .icon-wrap svg { width: 40px; height: 40px; fill: none; stroke: white; stroke-width: 2; }
+    .login-box .logo h1 { font-size: 1.5rem; font-weight: 800; color: var(--navy); }
+    .login-box .logo p { color: var(--navy2); font-size: 0.9rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-weight: 600; font-size: 0.85rem; color: var(--navy); margin-bottom: 0.5rem; }
+    .input-wrap { position: relative; }
+    .input-wrap input { width: 100%; border: 2px solid var(--pale); border-radius: 12px; padding: 0.85rem 3rem 0.85rem 1rem; font-size: 0.95rem; color: var(--navy); outline: none; font-family: 'Inter', sans-serif; }
+    .input-wrap input:focus { border-color: var(--navy); }
+    .toggle-pw { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--navy2); font-size: 1.1rem; }
+    .login-btn { width: 100%; padding: 1rem; background: var(--navy); color: white; font-weight: 700; font-size: 1rem; border: none; border-radius: 12px; cursor: pointer; margin-top: 0.5rem; }
+    .login-btn:disabled { opacity: 0.5; }
+    .login-error { color: var(--red); font-size: 0.8rem; margin-top: 0.5rem; text-align: center; display: none; }
+    .login-footer { text-align: center; font-size: 0.75rem; color: var(--gray); margin-top: 1.5rem; }
+
+    /* ===== PROFESSOR DASHBOARD ===== */
+    #screen-prof-dash { flex-direction: column; background: #f8faff; }
+    .dash-topbar { background: var(--navy); color: white; padding: 0.75rem 1.25rem; display: flex; align-items: center; justify-content: space-between; }
+    .dash-topbar .brand { display: flex; align-items: center; gap: 0.5rem; font-weight: 700; font-size: 0.9rem; }
+    .dash-topbar .right { display: flex; align-items: center; gap: 1rem; }
+    .dash-topbar .logout-btn { font-size: 0.8rem; color: #93c5fd; background: none; border: none; cursor: pointer; text-decoration: underline; }
+    .dash-body { flex: 1; padding: 1rem; max-width: 900px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr; gap: 1rem; }
+    @media(min-width: 768px) { .dash-body { grid-template-columns: 1fr 280px; } }
+    .card { background: white; border: 2px solid var(--pale); border-radius: 16px; padding: 1.25rem; }
+    .card-title { font-size: 0.75rem; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; }
+    /* Slide preview */
+    .slide-type-badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.7rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .type-activity { background: var(--navy); color: white; }
+    .type-content { background: var(--pale); color: var(--navy); }
+    .current-slide-title { font-size: 1.1rem; font-weight: 800; color: var(--navy); margin-bottom: 0.75rem; }
+    .slide-nav { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+    .slide-nav-btn { padding: 0.6rem 1rem; border-radius: 10px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: 2px solid var(--navy); }
+    .slide-nav-btn.primary { background: var(--navy); color: white; }
+    .slide-nav-btn.secondary { background: white; color: var(--navy); }
+    .slide-nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .slide-dots { flex: 1; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+    .slide-dot { width: 26px; height: 26px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; cursor: pointer; border: none; transition: all 0.15s; }
+    .slide-dot.current { background: var(--navy); color: white; }
+    .slide-dot.activity { background: var(--pale); color: var(--navy); }
+    .slide-dot.content { background: #f3f4f6; color: #6b7280; }
+    /* Controls */
+    .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+    .ctrl-btn { padding: 0.75rem; border-radius: 10px; font-weight: 600; font-size: 0.8rem; cursor: pointer; border: 2px solid transparent; display: flex; align-items: center; justify-content: center; gap: 0.4rem; transition: all 0.15s; }
+    .ctrl-btn.navy { background: var(--navy); color: white; border-color: var(--navy); }
+    .ctrl-btn.navy:hover { background: var(--navy2); }
+    .ctrl-btn.green { background: #16a34a; color: white; border-color: #16a34a; }
+    .ctrl-btn.yellow { background: #ca8a04; color: white; border-color: #ca8a04; }
+    .ctrl-btn.outline { background: white; color: var(--navy); border-color: var(--navy); }
+    .ctrl-btn.outline:hover { background: var(--pale); }
+    .ctrl-btn.danger { background: white; color: var(--red); border-color: #fca5a5; }
+    .ctrl-btn.danger:hover { background: #fef2f2; }
+    .ctrl-btn.full { grid-column: 1 / -1; }
+    /* Responses */
+    .resp-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .resp-item { border-radius: 10px; padding: 0.75rem; border: 2px solid; display: flex; align-items: center; justify-content: space-between; }
+    .resp-item.answered { border-color: #bbf7d0; background: #f0fdf4; }
+    .resp-item.waiting { border-color: var(--pale); background: #f9fafb; }
+    .resp-item .team-label { font-weight: 700; font-size: 0.85rem; color: var(--navy); }
+    .resp-item .resp-text { font-size: 0.75rem; color: #4b5563; margin-top: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+    /* Scoreboard */
+    .score-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .score-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; border-radius: 10px; }
+    .score-item.first { background: var(--navy); color: white; }
+    .score-item.other { background: var(--pale); }
+    .score-rank { width: 24px; text-align: center; font-size: 1rem; }
+    .score-team { flex: 1; font-weight: 600; font-size: 0.85rem; }
+    .score-pts { font-weight: 800; font-size: 1.1rem; }
+    /* Status */
+    .status-list { display: flex; flex-direction: column; gap: 0.6rem; }
+    .status-row { display: flex; align-items: center; justify-content: space-between; }
+    .status-row span { font-size: 0.85rem; color: #4b5563; }
+    .status-pill { font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px; }
+    .pill-visible { background: #dcfce7; color: #16a34a; }
+    .pill-hidden { background: #f3f4f6; color: #6b7280; }
+    .pill-yellow { background: #fef9c3; color: #ca8a04; }
+    /* Slide list */
+    .slide-list { max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+    .slide-list-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 8px; cursor: pointer; font-size: 0.8rem; color: var(--navy); border: none; background: none; text-align: left; width: 100%; }
+    .slide-list-item:hover { background: var(--pale); }
+    .slide-list-item.active { background: var(--navy); color: white; font-weight: 700; }
+    .slide-list-item .sli-num { width: 20px; font-weight: 700; }
+    .slide-list-item .sli-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .slide-list-item .sli-star { color: #eab308; font-size: 0.7rem; }
+
+    /* ===== PROJECTOR ===== */
+    #screen-projector { flex-direction: column; background: white; }
+    .proj-topbar { background: var(--navy); color: white; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+    .proj-topbar .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .proj-topbar .brand h1 { font-size: 1.1rem; font-weight: 800; }
+    .proj-topbar .brand p { font-size: 0.75rem; color: #93c5fd; }
+    .proj-topbar .slide-counter { font-size: 1.5rem; font-weight: 900; }
+    .proj-topbar .activity-badge { background: #eab308; color: var(--navy); padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 800; }
+    .proj-body { flex: 1; padding: 2rem; display: flex; flex-direction: column; }
+    /* Cover */
+    .proj-cover { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .proj-cover .big-logo { width: 100px; height: 100px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; }
+    .proj-cover .big-logo svg { width: 50px; height: 50px; fill: none; stroke: white; stroke-width: 2; }
+    .proj-cover h1 { font-size: 3rem; font-weight: 900; color: var(--navy); max-width: 700px; line-height: 1.2; margin-bottom: 1rem; }
+    .proj-cover .subtitle { font-size: 1.4rem; color: var(--navy2); font-weight: 600; margin-bottom: 1rem; }
+    .proj-cover .meta { font-size: 1rem; color: var(--gray); }
+    /* Content */
+    .proj-content h1 { font-size: 2.2rem; font-weight: 900; color: var(--navy); margin-bottom: 1.25rem; }
+    .proj-highlight { background: var(--navy); color: white; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; font-size: 1.1rem; font-weight: 600; line-height: 1.5; }
+    .proj-list { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; }
+    .proj-list li { display: flex; align-items: flex-start; gap: 1rem; font-size: 1.1rem; color: var(--navy); line-height: 1.5; padding-bottom: 0.75rem; border-bottom: 1px solid var(--pale); }
+    .proj-list li:last-child { border-bottom: none; }
+    .proj-list li::before { content: ''; width: 10px; height: 10px; border-radius: 50%; background: var(--navy); flex-shrink: 0; margin-top: 0.5rem; }
+    /* Activity waiting */
+    .proj-activity-wait { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .proj-activity-wait h1 { font-size: 2rem; font-weight: 900; color: var(--navy); margin-bottom: 1rem; }
+    .proj-activity-wait .q-box { background: var(--pale); border-radius: 16px; padding: 1.5rem; max-width: 700px; margin-bottom: 1.5rem; font-size: 1.1rem; font-weight: 600; color: var(--navy); line-height: 1.6; white-space: pre-line; }
+    .proj-activity-wait .counter { background: var(--navy); color: white; border-radius: 999px; padding: 0.75rem 2rem; font-size: 1.2rem; font-weight: 800; display: inline-flex; align-items: center; gap: 0.5rem; }
+    .team-dots { display: flex; gap: 0.75rem; margin-top: 1rem; }
+    .team-dot-item { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+    .team-dot-circle { width: 16px; height: 16px; border-radius: 50%; }
+    .team-dot-circle.done { background: #16a34a; }
+    .team-dot-circle.waiting { background: #d1d5db; }
+    .team-dot-label { font-size: 0.65rem; color: var(--gray); }
+    /* Responses grid */
+    .proj-responses { flex: 1; display: flex; flex-direction: column; }
+    .proj-responses .q-header { background: var(--pale); border-radius: 12px; padding: 1rem; margin-bottom: 1rem; font-size: 1rem; font-weight: 600; color: var(--navy); white-space: pre-line; }
+    .teams-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.75rem; flex: 1; }
+    .team-card { display: flex; flex-direction: column; border-radius: 14px; overflow: hidden; border: 2px solid; }
+    .team-card-header { padding: 0.6rem 0.75rem; display: flex; align-items: center; justify-content: space-between; }
+    .team-card-header .name { font-weight: 800; font-size: 0.85rem; }
+    .team-card-body { flex: 1; padding: 0.75rem; background: white; }
+    .team-card-footer { padding: 0.4rem; text-align: center; font-size: 0.75rem; font-weight: 700; }
+    .opt-answer { border-radius: 10px; padding: 0.75rem; text-align: center; margin-bottom: 0.5rem; }
+    .opt-answer .opt-letter { font-size: 1.8rem; font-weight: 900; }
+    .opt-answer .opt-text { font-size: 0.75rem; line-height: 1.3; margin-top: 0.25rem; }
+    .correct-answer-bar { background: #dcfce7; border: 1px solid #86efac; border-radius: 10px; padding: 0.75rem 1rem; margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #15803d; font-weight: 600; }
+    /* Scoreboard projector */
+    .proj-score { flex: 1; display: flex; flex-direction: column; }
+    .proj-score h1 { font-size: 2.5rem; font-weight: 900; color: var(--navy); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
+    .score-bars { display: flex; flex-direction: column; gap: 1rem; flex: 1; justify-content: center; }
+    .score-bar-row { display: flex; align-items: center; gap: 1rem; }
+    .score-bar-rank { width: 40px; text-align: center; font-size: 1.5rem; }
+    .score-bar-team { width: 100px; font-weight: 700; font-size: 1rem; color: var(--navy); }
+    .score-bar-track { flex: 1; background: #f3f4f6; border-radius: 999px; height: 48px; overflow: hidden; }
+    .score-bar-fill { height: 100%; border-radius: 999px; display: flex; align-items: center; justify-content: flex-end; padding-right: 1rem; transition: width 0.7s ease; }
+    .score-bar-fill span { color: white; font-weight: 900; font-size: 1.2rem; }
+    .score-bar-pts { width: 60px; text-align: right; font-weight: 900; font-size: 1.5rem; color: var(--navy); }
+    /* Projector bottom bar */
+    .proj-bottom { background: var(--pale); padding: 0.75rem 2rem; display: flex; align-items: center; justify-content: space-between; }
+    .proj-bottom .team-pills { display: flex; gap: 0.5rem; }
+    .proj-bottom .team-pill { padding: 0.3rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem; }
+    .team-pill.done { background: var(--navy); color: white; }
+    .team-pill.waiting { background: white; color: var(--gray); border: 1px solid #e5e7eb; }
+    .team-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .team-pill.done .dot { background: #4ade80; }
+    .team-pill.waiting .dot { background: #d1d5db; }
+
+    /* ===== RESPONSIVE ===== */
+    @media(max-width: 640px) {
+      .teams-grid { grid-template-columns: repeat(2, 1fr); }
+      .proj-cover h1 { font-size: 1.8rem; }
+      .proj-content h1 { font-size: 1.5rem; }
+      .proj-list li { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==================== SCREEN: TEAM SELECT ==================== -->
+<div id="screen-team" class="screen active">
+  <div class="team-header">
+    <div class="team-logo">
+      <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+    </div>
+    <h1>Sala de Aula Interativa</h1>
+    <p>Compliance — Governança Corporativa</p>
+    <small>Selecione sua equipe para participar da aula</small>
+  </div>
+  <div class="team-list">
+    <button class="team-btn" onclick="selectTeam('Equipe 1')"><span class="team-icon">🔵</span> Equipe 1</button>
+    <button class="team-btn" onclick="selectTeam('Equipe 2')"><span class="team-icon">🟦</span> Equipe 2</button>
+    <button class="team-btn" onclick="selectTeam('Equipe 3')"><span class="team-icon">🛡️</span> Equipe 3</button>
+    <button class="team-btn" onclick="selectTeam('Equipe 4')"><span class="team-icon">⚖️</span> Equipe 4</button>
+    <button class="team-btn" onclick="selectTeam('Equipe 5')"><span class="team-icon">🏛️</span> Equipe 5</button>
+  </div>
+  <p class="team-footer">Sem necessidade de cadastro · Acesse pelo celular</p>
+</div>
+
+<!-- ==================== SCREEN: CONFIRM ==================== -->
+<div id="screen-confirm" class="screen">
+  <div class="confirm-box">
+    <div class="confirm-card">
+      <div class="big-icon" id="confirm-icon">🔵</div>
+      <h2 id="confirm-name">Equipe 1</h2>
+      <p>Confirme sua seleção para entrar na aula</p>
+    </div>
+    <div class="confirm-btns">
+      <button class="btn-back" onclick="showScreen('screen-team')">Voltar</button>
+      <button class="btn-enter" onclick="enterActivity()">Entrar na Aula</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN: STUDENT ACTIVITY ==================== -->
+<div id="screen-activity" class="screen">
+  <div class="act-topbar">
+    <div class="team-name">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      <span id="act-team-name">Equipe 1</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem">
+      <span class="slide-info" id="act-slide-info">Slide 1/16</span>
+      <button class="leave-btn" onclick="leaveActivity()">Sair</button>
+    </div>
+  </div>
+  <div class="act-body" id="act-body"><!-- rendered by JS --></div>
+</div>
+
+<!-- ==================== SCREEN: PROFESSOR LOGIN ==================== -->
+<div id="screen-prof-login" class="screen">
+  <div class="login-box">
+    <div class="logo">
+      <div class="icon-wrap">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      </div>
+      <h1>Painel do Professor</h1>
+      <p>Compliance — Governança Corporativa</p>
+    </div>
+    <div class="form-group">
+      <label>🔒 Senha de Acesso</label>
+      <div class="input-wrap">
+        <input type="password" id="prof-password" placeholder="Digite a senha do professor" onkeydown="if(event.key==='Enter')profLogin()" />
+        <button class="toggle-pw" onclick="togglePw()" id="pw-toggle">👁</button>
+      </div>
+    </div>
+    <button class="login-btn" onclick="profLogin()">Acessar Painel</button>
+    <div class="login-error" id="login-error">Senha incorreta. Tente novamente.</div>
+    <p class="login-footer">Acesso restrito ao professor responsável pela aula</p>
+  </div>
+</div>
+
+<!-- ==================== SCREEN: PROFESSOR DASHBOARD ==================== -->
+<div id="screen-prof-dash" class="screen">
+  <div class="dash-topbar">
+    <div class="brand">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      Painel do Professor
+    </div>
+    <div class="right">
+      <button class="logout-btn" onclick="profLogout()">Sair</button>
+    </div>
+  </div>
+  <div class="dash-body">
+    <!-- Left column -->
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <!-- Slide control -->
+      <div class="card">
+        <div class="card-title">Slide Atual</div>
+        <div id="dash-slide-badge"></div>
+        <div class="current-slide-title" id="dash-slide-title"></div>
+        <div id="dash-slide-question" style="font-size:0.85rem;color:#4b5563;line-height:1.5;margin-bottom:0.75rem;"></div>
+        <div class="slide-nav">
+          <button class="slide-nav-btn secondary" id="btn-prev" onclick="dashGoSlide(state.currentSlide-1)">← Anterior</button>
+          <div class="slide-dots" id="dash-dots"></div>
+          <button class="slide-nav-btn primary" id="btn-next" onclick="dashGoSlide(state.currentSlide+1)">Próximo →</button>
+        </div>
+      </div>
+      <!-- Controls -->
+      <div class="card">
+        <div class="card-title">Controles da Aula</div>
+        <div class="controls-grid">
+          <button class="ctrl-btn navy" id="btn-toggle-resp" onclick="toggleResponses()">👁 Liberar Respostas</button>
+          <button class="ctrl-btn navy" id="btn-toggle-score" onclick="toggleScores()">🏆 Mostrar Placar</button>
+          <button class="ctrl-btn outline" onclick="clearResponses()">🗑 Limpar Respostas</button>
+          <button class="ctrl-btn danger" onclick="resetScores()">↺ Zerar Placar</button>
+          <button class="ctrl-btn outline full" onclick="openProjector()">📺 Abrir Projetor (nova aba)</button>
+        </div>
+      </div>
+      <!-- Responses -->
+      <div class="card" id="dash-responses-card">
+        <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;">
+          Respostas Recebidas
+          <span id="dash-resp-count" style="background:var(--pale);color:var(--navy);font-size:0.75rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:999px;"></span>
+        </div>
+        <div class="resp-list" id="dash-resp-list"></div>
+      </div>
+    </div>
+    <!-- Right column -->
+    <div style="display:flex;flex-direction:column;gap:1rem;">
+      <!-- Scoreboard -->
+      <div class="card">
+        <div class="card-title">🏆 Placar</div>
+        <div class="score-list" id="dash-score-list"></div>
+      </div>
+      <!-- Status -->
+      <div class="card">
+        <div class="card-title">Status</div>
+        <div class="status-list">
+          <div class="status-row"><span>Respostas no Projetor</span><span class="status-pill" id="st-resp">OCULTO</span></div>
+          <div class="status-row"><span>Placar no Projetor</span><span class="status-pill" id="st-score">OCULTO</span></div>
+          <div class="status-row"><span>Equipes responderam</span><span class="status-pill pill-yellow" id="st-teams">0/5</span></div>
+        </div>
+      </div>
+      <!-- Slide list -->
+      <div class="card">
+        <div class="card-title">Roteiro da Aula</div>
+        <div class="slide-list" id="dash-slide-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCREEN: PROJECTOR ==================== -->
+<div id="screen-projector" class="screen">
+  <div class="proj-topbar">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+      <div>
+        <h1>Compliance no Setor Público vs. Privado</h1>
+        <p>Governança Corporativa</p>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <span class="slide-counter" id="proj-slide-counter">1/16</span>
+      <span class="activity-badge" id="proj-activity-badge" style="display:none;">★ ATIVIDADE</span>
+    </div>
+  </div>
+  <div class="proj-body" id="proj-body"><!-- rendered by JS --></div>
+  <div class="proj-bottom">
+    <div class="team-pills" id="proj-team-pills"></div>
+    <span style="font-size:0.75rem;color:var(--gray);">Atualiza automaticamente</span>
+  </div>
+</div>
+
+<!-- ==================== NAVIGATION BAR (hidden, for URL routing) ==================== -->
+<div id="nav-bar" style="position:fixed;bottom:0;left:0;right:0;background:var(--navy);padding:0.5rem;display:flex;gap:0.5rem;justify-content:center;z-index:100;display:none;">
+  <button onclick="showScreen('screen-team')" style="color:white;background:none;border:1px solid #93c5fd;padding:0.3rem 0.75rem;border-radius:8px;font-size:0.75rem;cursor:pointer;">Alunos</button>
+  <button onclick="showScreen('screen-prof-login')" style="color:white;background:none;border:1px solid #93c5fd;padding:0.3rem 0.75rem;border-radius:8px;font-size:0.75rem;cursor:pointer;">Professor</button>
+  <button onclick="showScreen('screen-projector');startProjectorLoop()" style="color:white;background:none;border:1px solid #93c5fd;padding:0.3rem 0.75rem;border-radius:8px;font-size:0.75rem;cursor:pointer;">Projetor</button>
+</div>
+
+<script>
+// ===================== DATA =====================
+const TEAMS = ["Equipe 1","Equipe 2","Equipe 3","Equipe 4","Equipe 5"];
+const TEAM_ICONS = ["🔵","🟦","🛡️","⚖️","🏛️"];
+const TEAM_COLORS = ["#001F3F","#003D7A","#0055A5","#0066CC","#1a3a6b"];
+const PROF_PASSWORD = "compliance2026";
+
+const SLIDES = [
+  { index:1, type:"cover", title:"Compliance no Setor Público vs. Privado", highlight:"Estudo de Caso Comparativo — Análise de Editais e Transparência", content:["Disciplina: Governança Corporativa","Aula dinâmica com estudo de caso e atividades em equipe"] },
+  { index:2, type:"content", title:"Objetivos da Aula", content:["Compreender as diferenças e semelhanças entre compliance público e privado","Analisar a importância da transparência em editais e contratações","Identificar riscos de compliance em processos licitatórios","Desenvolver propostas práticas de melhoria em programas de integridade"] },
+  { index:3, type:"content", title:"O que é Compliance?", highlight:"Estar em conformidade com leis, regulamentos, normas internas e princípios éticos", content:["Origem: do inglês 'to comply' — agir de acordo com regras e padrões","Vai além do cumprimento legal: envolve cultura organizacional e ética","Pilares: Prevenção, Detecção e Resposta a irregularidades","Instrumento essencial de Governança Corporativa e gestão de riscos"] },
+  { index:4, type:"content", title:"Marco Legal — Setor Público", content:["Lei Anticorrupção (12.846/2013): responsabilização objetiva de pessoas jurídicas por atos lesivos à administração pública","Nova Lei de Licitações (14.133/2021): exige programa de integridade para contratos acima de R$ 200 milhões","Lei de Acesso à Informação (12.527/2011): obrigatoriedade de transparência ativa e passiva","Decreto 9.203/2017: institui a Política de Governança da Administração Pública Federal","CGU: órgão central de controle e promoção da integridade pública"] },
+  { index:5, type:"content", title:"Marco Legal — Setor Privado", content:["Lei Anticorrupção (12.846/2013): aplica-se também a empresas privadas que se relacionam com o poder público","Decreto 11.129/2022: regulamenta programas de integridade para empresas privadas","LGPD (13.709/2018): proteção de dados pessoais como componente de compliance","Normas internacionais: FCPA (EUA), UK Bribery Act, ISO 37001 (antissuborno)","Incentivos: redução de sanções para empresas com programas de integridade certificados"] },
+  { index:6, type:"content", title:"Comparativo: Público vs. Privado", content:["MOTIVAÇÃO — Público: obrigação legal e controle social | Privado: reputação, acesso a mercados e redução de riscos","FISCALIZAÇÃO — Público: CGU, TCU, MP, Tribunais | Privado: autorregulação, auditoria externa, CVM","TRANSPARÊNCIA — Público: obrigatória (LAI) | Privado: voluntária ou exigida por contratos","SANÇÕES — Público: responsabilização do agente e da entidade | Privado: multas, suspensão, leniência","CULTURA — Público: desafio de resistência burocrática | Privado: desafio de comprometimento da alta liderança"] },
+  { index:7, type:"activity", title:"Atividade 1 — Quiz: Fundamentos de Compliance", content:[], activity:{ type:"quiz", question:"Qual das alternativas representa corretamente uma diferença fundamental entre o compliance no setor público e no setor privado?", points:20, options:[{id:"a",text:"No setor privado, o compliance é obrigatório por lei para todas as empresas, enquanto no público é opcional"},{id:"b",text:"No setor público, a transparência é uma obrigação legal (LAI), enquanto no privado ela é majoritariamente voluntária ou contratual"},{id:"c",text:"O setor público não possui órgãos de fiscalização de compliance, ao contrário do privado"},{id:"d",text:"A Lei Anticorrupção (12.846/2013) aplica-se exclusivamente ao setor privado"}], correctAnswer:"b", hint:"Pense na Lei de Acesso à Informação e nas obrigações de transparência ativa." } },
+  { index:8, type:"content", title:"Editais e Transparência — Conceitos", content:["Edital: instrumento convocatório que define as regras de uma licitação pública","Transparência ativa: publicação proativa de informações (Portal da Transparência, PNCP)","Transparência passiva: atendimento a pedidos de informação via LAI","Critérios de compliance em editais: habilitação jurídica, regularidade fiscal, qualificação técnica e econômica","Cláusula de integridade: exigência crescente em contratos públicos de grande porte"] },
+  { index:9, type:"content", title:"Análise de Edital Público — Caso Real", highlight:"Pregão Eletrônico nº 001/2023 — Ministério da Saúde (Aquisição de Equipamentos Hospitalares)", content:["Valor estimado: R$ 48 milhões | Modalidade: Pregão Eletrônico (Lei 14.133/2021)","Exigências de compliance: certidões negativas, CNEP, CEIS, declaração de integridade","Transparência: publicado no PNCP, Diário Oficial e Portal da Transparência","Ponto crítico identificado: ausência de cláusula de programa de integridade para fornecedores","Resultado: contratação questionada pelo TCU por sobrepreço — investigação em andamento"] },
+  { index:10, type:"activity", title:"Atividade 2 — Votação: Maior Desafio", content:[], activity:{ type:"vote", question:"Na sua avaliação, qual é o MAIOR desafio para implementar compliance efetivo em editais públicos no Brasil?", points:10, options:[{id:"a",text:"Falta de cultura de integridade nos órgãos públicos"},{id:"b",text:"Legislação complexa e fragmentada"},{id:"c",text:"Ausência de capacitação dos servidores"},{id:"d",text:"Pressão política sobre processos licitatórios"},{id:"e",text:"Falta de recursos tecnológicos para fiscalização"}] } },
+  { index:11, type:"content", title:"Estudo de Caso — Petrobras (Setor Privado)", highlight:"Operação Lava Jato (2014–2021): maior caso de corrupção corporativa da história brasileira", content:["Esquema: pagamento de propinas a executivos e partidos políticos em contratos superfaturados","Falha de compliance: ausência de programa de integridade, conflito de interesses, captura política","Consequências: perda de R$ 6,2 bilhões, rebaixamento de rating, saída da NYSE temporariamente","Resposta: criação da Diretoria de Governança e Conformidade, adoção da ISO 37001","Lição: compliance não é custo — é proteção do valor da empresa e da confiança pública"] },
+  { index:12, type:"content", title:"Estudo de Caso — Prefeitura de São Paulo (Setor Público)", highlight:"Programa de Integridade SP (2019–presente): referência nacional em compliance público municipal", content:["Contexto: São Paulo foi a primeira capital a implementar programa de integridade estruturado","Ações: mapeamento de riscos, canal de denúncias, treinamentos obrigatórios para servidores","Transparência: 100% dos contratos acima de R$ 1 milhão publicados com dados abertos","Resultado: redução de 34% em impugnações de editais entre 2019 e 2022","Desafio persistente: rotatividade de servidores e manutenção da cultura de integridade"] },
+  { index:13, type:"activity", title:"Atividade 3 — Análise de Caso Comparativo", content:[], activity:{ type:"case", question:"Comparando os casos Petrobras e Prefeitura de SP: identifique UMA falha crítica de compliance em cada caso e proponha UMA medida preventiva específica que poderia ter evitado ou mitigado o problema. Seja objetivo e use conceitos da aula.", points:30, hint:"Considere: cultura organizacional, estrutura de controles, transparência e responsabilização." } },
+  { index:14, type:"content", title:"Boas Práticas de Compliance", content:["Tone at the top: comprometimento visível da alta liderança é o fator mais crítico de sucesso","Canal de denúncias: anônimo, independente e com proteção ao denunciante (Lei 13.608/2018)","Treinamentos periódicos: adaptados ao nível hierárquico e às funções de risco","Due diligence de terceiros: avaliação de fornecedores, parceiros e intermediários","Monitoramento contínuo: indicadores de risco, auditorias internas e revisão periódica do programa","Transparência proativa: publicação voluntária além do exigido como diferencial competitivo"] },
+  { index:15, type:"activity", title:"Atividade 4 — Proposta de Melhoria", content:[], activity:{ type:"open", question:"Sua equipe foi contratada como consultora de compliance. Escolha UMA das situações abaixo e elabore uma proposta de melhoria com no mínimo 3 ações concretas:\n\n(A) Uma autarquia federal que nunca teve programa de integridade e precisa se adequar à Nova Lei de Licitações\n\n(B) Uma empresa de médio porte que quer participar de licitações públicas e precisa estruturar seu compliance", points:40, hint:"Inclua: diagnóstico, ações prioritárias, responsáveis e indicadores de resultado." } },
+  { index:16, type:"closing", title:"Conclusão e Referências", highlight:"Compliance não é burocracia — é a base da confiança institucional", content:["BRASIL. Lei nº 12.846/2013 — Lei Anticorrupção","BRASIL. Lei nº 14.133/2021 — Nova Lei de Licitações e Contratos","BRASIL. Lei nº 12.527/2011 — Lei de Acesso à Informação","CGU. Manual de Programa de Integridade para Empresas. Brasília, 2021","FIESP. Relatório Corrupção: custos econômicos e propostas de combate. 2010","TRANSPARÊNCIA INTERNACIONAL. Índice de Percepção da Corrupção, 2023","COIMBRA, M.; MANZI, V. Manual de Compliance. São Paulo: Atlas, 2010"] }
+];
+
+// ===================== STATE =====================
+const state = {
+  currentTeam: null,
+  currentSlide: 1,
+  responsesVisible: false,
+  scoresVisible: false,
+  responses: {}, // { slideIndex: { teamName: { response, isCorrect, pointsEarned } } }
+  scores: { "Equipe 1":0,"Equipe 2":0,"Equipe 3":0,"Equipe 4":0,"Equipe 5":0 },
+  submitted: {}, // { slideIndex: { teamName: true } }
+  selectedOption: null,
+  openText: "",
+  projectorInterval: null,
+};
+
+function saveState() { try { localStorage.setItem('compliance_state', JSON.stringify(state)); } catch(e){} }
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('compliance_state') || 'null');
+    if (s) {
+      state.currentSlide = s.currentSlide || 1;
+      state.responsesVisible = s.responsesVisible || false;
+      state.scoresVisible = s.scoresVisible || false;
+      state.responses = s.responses || {};
+      state.scores = s.scores || { "Equipe 1":0,"Equipe 2":0,"Equipe 3":0,"Equipe 4":0,"Equipe 5":0 };
+      state.submitted = s.submitted || {};
+    }
+  } catch(e){}
+}
+
+// ===================== ROUTING =====================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function getHash() { return window.location.hash.replace('#','') || 'student'; }
+
+function route() {
+  const h = getHash();
+  if (h === 'professor') { showScreen('screen-prof-login'); }
+  else if (h === 'projector') { showScreen('screen-projector'); startProjectorLoop(); }
+  else { showScreen('screen-team'); }
+}
+
+window.addEventListener('hashchange', route);
+
+// ===================== TEAM SELECT =====================
+function selectTeam(team) {
+  state.currentTeam = team;
+  const idx = TEAMS.indexOf(team);
+  document.getElementById('confirm-icon').textContent = TEAM_ICONS[idx];
+  document.getElementById('confirm-name').textContent = team;
+  showScreen('screen-confirm');
+}
+
+function enterActivity() {
+  document.getElementById('act-team-name').textContent = state.currentTeam;
+  showScreen('screen-activity');
+  renderActivity();
+  startActivityLoop();
+}
+
+function leaveActivity() {
+  state.currentTeam = null;
+  if (state._activityInterval) clearInterval(state._activityInterval);
+  showScreen('screen-team');
+}
+
+function startActivityLoop() {
+  if (state._activityInterval) clearInterval(state._activityInterval);
+  state._activityInterval = setInterval(() => {
+    loadState();
+    renderActivity();
+  }, 2000);
+}
+
+// ===================== ACTIVITY RENDER =====================
+function renderActivity() {
+  const slide = SLIDES.find(s => s.index === state.currentSlide);
+  const body = document.getElementById('act-body');
+  document.getElementById('act-slide-info').textContent = `Slide ${state.currentSlide}/${SLIDES.length}`;
+  if (!slide) return;
+
+  const isActivity = slide.type === 'activity';
+  const hasSubmitted = state.submitted[state.currentSlide]?.[state.currentTeam];
+
+  let html = '';
+  html += `<span class="slide-badge ${isActivity?'badge-activity':'badge-content'}">${isActivity?'★ ATIVIDADE EM EQUIPE':'📖 CONTEÚDO'}</span>`;
+  html += `<div class="slide-title">${slide.title}</div>`;
+
+  if (!isActivity) {
+    if (slide.highlight) html += `<div class="highlight-box">${slide.highlight}</div>`;
+    html += `<ul class="content-list">`;
+    slide.content.forEach(c => { html += `<li>${c}</li>`; });
+    html += `</ul>`;
+    html += `<div class="waiting-box"><p>📡 Acompanhe o professor</p><small>A próxima atividade será liberada em breve</small></div>`;
+  } else if (hasSubmitted) {
+    html += `<div class="submitted-box"><div class="check-icon">✅</div><h3>Resposta Enviada!</h3><p>Aguarde o professor liberar os resultados no projetor.</p>`;
+    if (slide.activity.points) html += `<div class="points-badge">Até ${slide.activity.points} pontos em jogo</div>`;
+    html += `</div>`;
+  } else {
+    const act = slide.activity;
+    html += `<div class="question-box">${act.question}</div>`;
+    if (act.hint) html += `<div class="hint-box"><strong>Dica:</strong> ${act.hint}</div>`;
+
+    if (act.type === 'quiz' || act.type === 'vote') {
+      html += `<div class="options-list">`;
+      act.options.forEach(opt => {
+        const sel = state.selectedOption === opt.id ? 'selected' : '';
+        html += `<button class="option-btn ${sel}" onclick="selectOption('${opt.id}')"><span class="opt-id">${opt.id.toUpperCase()})</span>${opt.text}</button>`;
+      });
+      html += `</div>`;
+    } else {
+      html += `<textarea class="open-answer" rows="6" placeholder="Digite a resposta da sua equipe aqui..." id="open-text" onchange="state.openText=this.value">${state.openText}</textarea>`;
+    }
+
+    html += `<button class="submit-btn" onclick="submitAnswer()">📤 Enviar Resposta da ${state.currentTeam}</button>`;
+    if (act.points) html += `<p class="points-note">Esta atividade vale até <strong>${act.points} pontos</strong></p>`;
+  }
+
+  body.innerHTML = html;
+  // Restore textarea
+  const ta = document.getElementById('open-text');
+  if (ta) { ta.value = state.openText; ta.addEventListener('input', e => state.openText = e.target.value); }
+}
+
+function selectOption(id) {
+  state.selectedOption = id;
+  renderActivity();
+}
+
+function submitAnswer() {
+  const slide = SLIDES.find(s => s.index === state.currentSlide);
+  if (!slide || !slide.activity) return;
+  const act = slide.activity;
+  let response = '', isCorrect = false, pointsEarned = 0;
+
+  if (act.type === 'quiz' || act.type === 'vote') {
+    if (!state.selectedOption) { alert('Selecione uma opção antes de enviar.'); return; }
+    response = state.selectedOption;
+    if (act.type === 'quiz' && act.correctAnswer) {
+      isCorrect = response === act.correctAnswer;
+      pointsEarned = isCorrect ? (act.points || 10) : 0;
+    } else { pointsEarned = act.points || 10; }
+  } else {
+    const ta = document.getElementById('open-text');
+    response = ta ? ta.value.trim() : state.openText.trim();
+    if (!response) { alert('Escreva sua resposta antes de enviar.'); return; }
+    pointsEarned = act.points || 20;
+  }
+
+  if (!state.responses[state.currentSlide]) state.responses[state.currentSlide] = {};
+  state.responses[state.currentSlide][state.currentTeam] = { response, isCorrect, pointsEarned };
+  if (!state.submitted[state.currentSlide]) state.submitted[state.currentSlide] = {};
+  state.submitted[state.currentSlide][state.currentTeam] = true;
+  state.scores[state.currentTeam] = (state.scores[state.currentTeam] || 0) + pointsEarned;
+  state.selectedOption = null;
+  state.openText = '';
+  saveState();
+  renderActivity();
+}
+
+// ===================== PROFESSOR =====================
+function togglePw() {
+  const inp = document.getElementById('prof-password');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function profLogin() {
+  const pw = document.getElementById('prof-password').value;
+  const err = document.getElementById('login-error');
+  if (pw === PROF_PASSWORD) {
+    err.style.display = 'none';
+    showScreen('screen-prof-dash');
+    renderDashboard();
+    startDashLoop();
+  } else {
+    err.style.display = 'block';
+  }
+}
+
+function profLogout() {
+  if (state._dashInterval) clearInterval(state._dashInterval);
+  document.getElementById('prof-password').value = '';
+  showScreen('screen-prof-login');
+}
+
+function startDashLoop() {
+  if (state._dashInterval) clearInterval(state._dashInterval);
+  state._dashInterval = setInterval(() => { loadState(); renderDashboard(); }, 2000);
+}
+
+function renderDashboard() {
+  const slide = SLIDES.find(s => s.index === state.currentSlide);
+  if (!slide) return;
+
+  // Badge
+  const badge = document.getElementById('dash-slide-badge');
+  badge.innerHTML = `<span class="slide-type-badge ${slide.type==='activity'?'type-activity':'type-content'}">${slide.type==='activity'?'ATIVIDADE':'CONTEÚDO'}</span>`;
+  document.getElementById('dash-slide-title').textContent = slide.title;
+  const qEl = document.getElementById('dash-slide-question');
+  qEl.textContent = slide.activity ? slide.activity.question.substring(0,120)+'...' : '';
+
+  // Nav buttons
+  document.getElementById('btn-prev').disabled = state.currentSlide <= 1;
+  document.getElementById('btn-next').disabled = state.currentSlide >= SLIDES.length;
+
+  // Dots
+  const dots = document.getElementById('dash-dots');
+  dots.innerHTML = SLIDES.map(s => `<button class="slide-dot ${s.index===state.currentSlide?'current':s.type==='activity'?'activity':'content'}" onclick="dashGoSlide(${s.index})">${s.index}</button>`).join('');
+
+  // Controls
+  const btnResp = document.getElementById('btn-toggle-resp');
+  btnResp.textContent = state.responsesVisible ? '🙈 Ocultar Respostas' : '👁 Liberar Respostas';
+  btnResp.className = `ctrl-btn ${state.responsesVisible?'green':'navy'}`;
+  const btnScore = document.getElementById('btn-toggle-score');
+  btnScore.textContent = state.scoresVisible ? '🙈 Ocultar Placar' : '🏆 Mostrar Placar';
+  btnScore.className = `ctrl-btn ${state.scoresVisible?'yellow':'navy'}`;
+
+  // Responses
+  const responses = state.responses[state.currentSlide] || {};
+  const respCount = Object.keys(responses).length;
+  document.getElementById('dash-resp-count').textContent = `${respCount}/5 equipes`;
+  document.getElementById('st-teams').textContent = `${respCount}/5`;
+
+  const respList = document.getElementById('dash-resp-list');
+  respList.innerHTML = TEAMS.map(t => {
+    const r = responses[t];
+    const isQuiz = slide.activity?.type === 'quiz' || slide.activity?.type === 'vote';
+    const respText = r ? (isQuiz ? `Opção: ${r.response.toUpperCase()}` : r.response.substring(0,60)+'...') : '';
+    return `<div class="resp-item ${r?'answered':'waiting'}">
+      <div><div class="team-label">${t}</div>${r?`<div class="resp-text">${respText}</div>`:''}</div>
+      <span>${r?'✅':'⏳'}</span>
+    </div>`;
+  }).join('');
+
+  // Status pills
+  const stResp = document.getElementById('st-resp');
+  stResp.textContent = state.responsesVisible ? 'VISÍVEL' : 'OCULTO';
+  stResp.className = `status-pill ${state.responsesVisible?'pill-visible':'pill-hidden'}`;
+  const stScore = document.getElementById('st-score');
+  stScore.textContent = state.scoresVisible ? 'VISÍVEL' : 'OCULTO';
+  stScore.className = `status-pill ${state.scoresVisible?'pill-yellow':'pill-hidden'}`;
+
+  // Scores
+  const sorted = Object.entries(state.scores).sort((a,b)=>b[1]-a[1]);
+  const scoreList = document.getElementById('dash-score-list');
+  scoreList.innerHTML = sorted.map(([team,pts],i) => `
+    <div class="score-item ${i===0&&pts>0?'first':'other'}">
+      <span class="score-rank">${i===0&&pts>0?'🥇':i===1&&pts>0?'🥈':i===2&&pts>0?'🥉':i+1}</span>
+      <span class="score-team">${team}</span>
+      <span class="score-pts">${pts}</span>
+    </div>`).join('');
+
+  // Slide list
+  const slideList = document.getElementById('dash-slide-list');
+  slideList.innerHTML = SLIDES.map(s => `
+    <button class="slide-list-item ${s.index===state.currentSlide?'active':''}" onclick="dashGoSlide(${s.index})">
+      <span class="sli-num">${s.index}</span>
+      <span class="sli-title">${s.title}</span>
+      ${s.type==='activity'?'<span class="sli-star">★</span>':''}
+    </button>`).join('');
+}
+
+function dashGoSlide(idx) {
+  if (idx < 1 || idx > SLIDES.length) return;
+  state.currentSlide = idx;
+  state.responsesVisible = false;
+  saveState();
+  renderDashboard();
+}
+
+function toggleResponses() {
+  state.responsesVisible = !state.responsesVisible;
+  saveState();
+  renderDashboard();
+}
+
+function toggleScores() {
+  state.scoresVisible = !state.scoresVisible;
+  saveState();
+  renderDashboard();
+}
+
+function clearResponses() {
+  if (!confirm('Limpar respostas deste slide?')) return;
+  delete state.responses[state.currentSlide];
+  delete state.submitted[state.currentSlide];
+  saveState();
+  renderDashboard();
+}
+
+function resetScores() {
+  if (!confirm('Zerar placar de todas as equipes?')) return;
+  TEAMS.forEach(t => state.scores[t] = 0);
+  saveState();
+  renderDashboard();
+}
+
+function openProjector() {
+  window.open(window.location.href.split('#')[0] + '#projector', '_blank');
+}
+
+// ===================== PROJECTOR =====================
+function startProjectorLoop() {
+  if (state.projectorInterval) clearInterval(state.projectorInterval);
+  renderProjector();
+  state.projectorInterval = setInterval(() => { loadState(); renderProjector(); }, 2000);
+}
+
+function renderProjector() {
+  const slide = SLIDES.find(s => s.index === state.currentSlide);
+  if (!slide) return;
+
+  document.getElementById('proj-slide-counter').textContent = `${state.currentSlide}/${SLIDES.length}`;
+  const actBadge = document.getElementById('proj-activity-badge');
+  actBadge.style.display = slide.type === 'activity' ? 'inline-block' : 'none';
+
+  const body = document.getElementById('proj-body');
+  const responses = state.responses[state.currentSlide] || {};
+
+  // Team pills (bottom bar)
+  const pills = document.getElementById('proj-team-pills');
+  pills.innerHTML = TEAMS.map(t => {
+    const done = !!responses[t];
+    return `<div class="team-pill ${done?'done':'waiting'}"><div class="dot"></div>${t}</div>`;
+  }).join('');
+
+  // SCORE VIEW
+  if (state.scoresVisible) {
+    const sorted = Object.entries(state.scores).sort((a,b)=>b[1]-a[1]);
+    const max = Math.max(...sorted.map(s=>s[1]), 1);
+    const colors = ['#001F3F','#003D7A','#0055A5','#0066CC','#1a3a6b'];
+    body.innerHTML = `<div class="proj-score">
+      <h1>🏆 Placar da Turma</h1>
+      <div class="score-bars">
+        ${sorted.map(([team,pts],i)=>`
+          <div class="score-bar-row">
+            <div class="score-bar-rank">${i===0&&pts>0?'🥇':i===1&&pts>0?'🥈':i===2&&pts>0?'🥉':i+1}</div>
+            <div class="score-bar-team">${team}</div>
+            <div class="score-bar-track">
+              <div class="score-bar-fill" style="width:${Math.max((pts/max)*100,5)}%;background:${colors[TEAMS.indexOf(team)]}">
+                <span>${pts}</span>
+              </div>
+            </div>
+            <div class="score-bar-pts">${pts}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+    return;
+  }
+
+  // RESPONSES VIEW
+  if (state.responsesVisible && slide.type === 'activity' && slide.activity) {
+    const act = slide.activity;
+    const isQuizVote = act.type === 'quiz' || act.type === 'vote';
+    const colors = ['#001F3F','#003D7A','#0055A5','#0066CC','#1a3a6b'];
+    const lightColors = ['#E8F0FE','#dce8f8','#d0e2f7','#c5dcf5','#d8e5f5'];
+
+    let teamsHtml = TEAMS.map((team,i)=>{
+      const r = responses[team];
+      const color = colors[i];
+      const light = lightColors[i];
+      let bodyHtml = '';
+      if (!r) {
+        bodyHtml = `<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#d1d5db;font-size:0.8rem;">Aguardando...</div>`;
+      } else if (isQuizVote) {
+        const opt = act.options?.find(o=>o.id===r.response);
+        const isCorrect = r.isCorrect;
+        const bg = act.type==='quiz' ? (isCorrect?'#dcfce7':'#fef2f2') : light;
+        const tc = act.type==='quiz' ? (isCorrect?'#15803d':'#dc2626') : '#001F3F';
+        bodyHtml = `<div class="opt-answer" style="background:${bg}">
+          <div class="opt-letter" style="color:${tc}">${r.response.toUpperCase()}</div>
+          ${opt?`<div class="opt-text" style="color:${tc}">${opt.text}</div>`:''}
+        </div>
+        ${act.type==='quiz'?`<div style="text-align:center;font-size:0.75rem;font-weight:700;color:${tc}">${isCorrect?`✓ Correto (+${r.pointsEarned}pts)`:'✗ Incorreto'}</div>`:''}`;
+      } else {
+        bodyHtml = `<p style="font-size:0.75rem;color:#001F3F;line-height:1.4;overflow-y:auto;max-height:120px;">${r.response}</p>`;
+      }
+      const footerHtml = r && r.pointsEarned > 0 ? `<div class="team-card-footer" style="background:${color};color:white;">+${r.pointsEarned} pts</div>` : '';
+      return `<div class="team-card" style="border-color:${r?color:'#e5e7eb'}">
+        <div class="team-card-header" style="background:${r?color:'#f3f4f6'}">
+          <span class="name" style="color:${r?'white':'#9ca3af'}">${team}</span>
+          <span>${r?'✅':'⏳'}</span>
+        </div>
+        <div class="team-card-body">${bodyHtml}</div>
+        ${footerHtml}
+      </div>`;
+    }).join('');
+
+    let correctBar = '';
+    if (act.type === 'quiz' && act.correctAnswer) {
+      const cOpt = act.options?.find(o=>o.id===act.correctAnswer);
+      correctBar = `<div class="correct-answer-bar">✅ Resposta correta: <strong>${act.correctAnswer.toUpperCase()})</strong> ${cOpt?.text||''}</div>`;
+    }
+
+    body.innerHTML = `<div class="proj-responses">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+        <h2 style="font-size:1.4rem;font-weight:900;color:#001F3F;">${slide.title}</h2>
+        <span style="background:#E8F0FE;color:#001F3F;font-weight:700;font-size:0.85rem;padding:0.3rem 0.75rem;border-radius:999px;">${Object.keys(responses).length}/5 responderam</span>
+      </div>
+      <div class="q-header">${act.question}</div>
+      <div class="teams-grid">${teamsHtml}</div>
+      ${correctBar}
+    </div>`;
+    return;
+  }
+
+  // DEFAULT CONTENT VIEW
+  if (slide.type === 'cover') {
+    body.innerHTML = `<div class="proj-cover">
+      <div class="big-logo"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" width="50" height="50"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.955 11.955 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg></div>
+      <h1>${slide.title}</h1>
+      <p class="subtitle">${slide.highlight||''}</p>
+      ${slide.content.map(c=>`<p class="meta">${c}</p>`).join('')}
+    </div>`;
+  } else if (slide.type === 'content') {
+    body.innerHTML = `<div class="proj-content">
+      <h1>${slide.title}</h1>
+      ${slide.highlight?`<div class="proj-highlight">${slide.highlight}</div>`:''}
+      <ul class="proj-list">${slide.content.map(c=>`<li>${c}</li>`).join('')}</ul>
+    </div>`;
+  } else if (slide.type === 'activity') {
+    const respCount = Object.keys(responses).length;
+    body.innerHTML = `<div class="proj-activity-wait">
+      <h1>${slide.title}</h1>
+      <div class="q-box">${slide.activity?.question||''}</div>
+      <div class="counter">⏳ ${respCount}/5 equipes responderam</div>
+      <div class="team-dots">${TEAMS.map(t=>`<div class="team-dot-item"><div class="team-dot-circle ${responses[t]?'done':'waiting'}"></div><span class="team-dot-label">${t.replace('Equipe ','E')}</span></div>`).join('')}</div>
+    </div>`;
+  } else if (slide.type === 'closing') {
+    body.innerHTML = `<div class="proj-content">
+      <h1>${slide.title}</h1>
+      ${slide.highlight?`<div class="proj-highlight" style="font-size:1.4rem;text-align:center;">${slide.highlight}</div>`:''}
+      <ul class="proj-list">${slide.content.map(c=>`<li>${c}</li>`).join('')}</ul>
+    </div>`;
+  }
+}
+
+// ===================== INIT =====================
+loadState();
+route();
+
+// Show nav bar hint for direct access
+if (getHash() === '') {
+  // Show a small floating button to access professor/projector
+  const fab = document.createElement('div');
+  fab.style.cssText = 'position:fixed;bottom:1rem;right:1rem;z-index:100;display:flex;flex-direction:column;gap:0.5rem;align-items:flex-end;';
+  fab.innerHTML = `
+    <button onclick="window.location.hash='professor'" style="background:#001F3F;color:white;border:none;padding:0.5rem 1rem;border-radius:8px;font-size:0.75rem;cursor:pointer;font-family:Inter,sans-serif;">👨‍🏫 Professor</button>
+    <button onclick="window.location.hash='projector'" style="background:#003D7A;color:white;border:none;padding:0.5rem 1rem;border-radius:8px;font-size:0.75rem;cursor:pointer;font-family:Inter,sans-serif;">📺 Projetor</button>
+  `;
+  document.body.appendChild(fab);
+}
+</script>
+</body>
+</html>
